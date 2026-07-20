@@ -1,0 +1,14 @@
+# .NET
+bin/
+obj/
+*.user
+
+# Rider / JetBrains
+.idea/
+
+# macOS
+.DS_Store
+
+# Secrets - mai committare
+**/appsettings.*.local.json
+**/secrets.json
