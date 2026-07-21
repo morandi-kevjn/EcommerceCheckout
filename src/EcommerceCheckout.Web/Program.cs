@@ -23,6 +23,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Seed solo in sviluppo
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var services = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    DbInitializer.EnsureSeeded(services);
+}
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
