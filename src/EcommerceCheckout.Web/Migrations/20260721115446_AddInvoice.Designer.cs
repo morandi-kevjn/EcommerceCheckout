@@ -4,6 +4,7 @@ using EcommerceCheckout.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EcommerceCheckout.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260721115446_AddInvoice")]
+    partial class AddInvoice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,21 +136,6 @@ namespace EcommerceCheckout.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Coupons");
-                });
-
-            modelBuilder.Entity("EcommerceCheckout.Web.Models.Entities.CouponProduct", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CouponId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "CouponId");
-
-                    b.HasIndex("CouponId");
-
-                    b.ToTable("CouponProduct");
                 });
 
             modelBuilder.Entity("EcommerceCheckout.Web.Models.Entities.Customer", b =>
@@ -454,25 +442,6 @@ namespace EcommerceCheckout.Web.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("EcommerceCheckout.Web.Models.Entities.CouponProduct", b =>
-                {
-                    b.HasOne("EcommerceCheckout.Web.Models.Entities.Coupon", "Coupon")
-                        .WithMany("CouponProducts")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EcommerceCheckout.Web.Models.Entities.Product", "Product")
-                        .WithMany("CouponProducts")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Coupon");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("EcommerceCheckout.Web.Models.Entities.Invoice", b =>
                 {
                     b.HasOne("EcommerceCheckout.Web.Models.Entities.Order", "Order")
@@ -542,19 +511,9 @@ namespace EcommerceCheckout.Web.Migrations
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("EcommerceCheckout.Web.Models.Entities.Coupon", b =>
-                {
-                    b.Navigation("CouponProducts");
-                });
-
             modelBuilder.Entity("EcommerceCheckout.Web.Models.Entities.Order", b =>
                 {
                     b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("EcommerceCheckout.Web.Models.Entities.Product", b =>
-                {
-                    b.Navigation("CouponProducts");
                 });
 #pragma warning restore 612, 618
         }

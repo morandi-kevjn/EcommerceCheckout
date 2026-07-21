@@ -15,4 +15,6 @@ public class Product
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
+    
+    public ICollection<CouponProduct> CouponProducts { get; set; } = new List<CouponProduct>();
 }

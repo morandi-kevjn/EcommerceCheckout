@@ -11,6 +11,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartItem> CartItems { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,5 +39,40 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<CartItem>()
             .Property(ci => ci.UnitPrice)
             .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Order>(e =>
+        {
+            e.Property(o => o.SubtotalAmount).HasPrecision(18, 2);
+            e.Property(o => o.DiscountAmount).HasPrecision(18, 2);
+            e.Property(o => o.TotalAmount).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<OrderItem>(e =>
+        {
+            e.Property(oi => oi.UnitPrice).HasPrecision(18, 2);
+            e.Property(oi => oi.LineTotal).HasPrecision(18, 2);
+        });
+        
+        modelBuilder.Entity<PaymentTransaction>()
+                .Property(pt => pt.Amount)
+                .HasPrecision(18, 2);
+        
+        modelBuilder.Entity<PaymentTransaction>()
+            .HasOne(i => i.Order)
+            .WithOne()
+            .HasForeignKey<PaymentTransaction>(i => i.OrderId);
+
+        modelBuilder.Entity<CouponProduct>(e =>
+        {
+            e.HasKey(cp => new { cp.ProductId, cp.CouponId });
+
+            e.HasOne(cp => cp.Coupon)
+                .WithMany(c => c.CouponProducts)
+                .HasForeignKey(cp => cp.CouponId);
+
+            e.HasOne(cp => cp.Product)
+                .WithMany(c => c.CouponProducts)
+                .HasForeignKey(cp => cp.ProductId);
+        });
     }
 }
