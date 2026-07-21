@@ -20,7 +20,7 @@ public class Order
     public required string OrderNumber { get; set; }
     
     public int CustomerId { get; set; }
-    public Customer Customer { get; set; }
+    public required Customer Customer { get; set; }
     
     public int? CartId { get; set; }
     public Cart? Cart { get; set; }
@@ -31,7 +31,7 @@ public class Order
     public decimal SubtotalAmount { get; set; }
     public decimal DiscountAmount { get; set; }
     public decimal TotalAmount { get; set; }
-    public string Currency { get; set; }
+    public string Currency { get; set; } = "EUR";
 
     public OrderStatus Status { get; set; } = OrderStatus.PendingPayment;
     public PaymentProviderType PaymentProvider { get; set; }
