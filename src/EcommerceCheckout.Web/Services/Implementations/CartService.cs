@@ -14,21 +14,25 @@ public class CartService : ICartServices
         _db = db;
     }
     
-    public async Task<Cart> GetOrCreateCartAsync(Guid cartToken)
+    public async Task<Cart> GetOrCreateCartAsync(Guid? cartToken)
     {
-        var cart = await _db.Carts
-            .Include(c => c.Items)
-            .ThenInclude(i => i.Product)
-            .FirstOrDefaultAsync(c => c.CartToken == cartToken);
+        if (cartToken is Guid token)
+        {
+            var existing = await _db.Carts
+                .Include(c => c.Items)
+                .ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(c => c.CartToken == token);
 
-        if (cart is not null)
-            return cart;
+            if (existing is not null)
+                return existing;
+        }
+
         
-        cart = new Cart { CartToken = cartToken };
-        _db.Carts.Add(cart);
+        var newCart = new Cart { CartToken = cartToken ?? Guid.NewGuid() };
+        _db.Carts.Add(newCart);
         await _db.SaveChangesAsync();
         
-        return cart;
+        return newCart;
     }
 
     public async Task AddItemAsync(Guid cartToken, int productId, int quantity)
@@ -66,5 +70,45 @@ public class CartService : ICartServices
         }
         
         await _db.SaveChangesAsync();
+    }
+
+    public async Task UpdateQuantityAsync(Guid cartToken, int productId, int newQuantity)
+    {
+        var cart = await GetOrCreateCartAsync(cartToken);
+        
+        var item = cart.Items.FirstOrDefault(i => i.ProductId == productId)
+            ?? throw new InvalidOperationException($"Product with id {productId} does not exist.");
+
+        if (newQuantity <= 0)
+        {
+            cart.Items.Remove(item);
+            _db.CartItems.Remove(item);
+        }
+        else
+        {
+            var product = await _db.Products.FindAsync(productId)
+                ?? throw new InvalidOperationException($"Product with id {productId} is not active.");
+            
+            if (product is not null && newQuantity > product.StockQty)
+                throw new InvalidOperationException($"Quantity {newQuantity} is larger than {product.StockQty}");
+            
+            item.Quantity = newQuantity;
+        }
+        
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task RemoveItemAsync(Guid cartToken, int productId)
+    {
+        var cart = await GetOrCreateCartAsync(cartToken);
+
+        var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+
+        if (item is not null)
+        {
+            cart.Items.Remove(item);
+            _db.CartItems.Remove(item);
+            await _db.SaveChangesAsync();
+        }
     }
 }

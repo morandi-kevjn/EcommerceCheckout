@@ -1,0 +1,21 @@
+@model EcommerceCheckout.Web.Models.Entities.Cart
+
+<h1>Carello:</h1>
+
+<p>Token: @Model.CartToken</p>
+
+@if (!Model.Items.Any())
+{
+    <p>Il carello é vuoto.</p>
+}
+else
+{
+    <ul>
+        @foreach (var item in Model.Items)
+        {
+            <li>
+                @item.Product.Name - Quantità: @item.Quantity - Prezzo: @item.UnitPrice
+            </li>
+        }
+    </ul>
+}
