@@ -1,8 +1,9 @@
 @model EcommerceCheckout.Web.Models.Entities.Cart
 
 <h1>Carello:</h1>
-
 <p>Token: @Model.CartToken</p>
+
+<div id="cart-alert" style="color: red;"></div>
 
 @if (!Model.Items.Any())
 {
@@ -13,9 +14,19 @@ else
     <ul>
         @foreach (var item in Model.Items)
         {
-            <li>
-                @item.Product.Name - Quantità: @item.Quantity - Prezzo: @item.UnitPrice
+            <li data-product-id="@item.ProductId">
+                @item.Product.Name - 
+                Quantità: <span class="qty-value">@item.Quantity</span> - 
+                Prezzo: <span class="qty-price">@item.UnitPrice</span>
+                <button class="qty-minus" data-product-id="@item.ProductId">-</button>
+                <button class="qty-plus" data-product-id="@item.ProductId">+</button>
+                <button class="qty-remove" data-product-id="@item.ProductId">Rimuovi</button>
             </li>
         }
     </ul>
+}
+
+@section Scripts
+{
+    <script src="~/js/cart.js"></script>
 }
