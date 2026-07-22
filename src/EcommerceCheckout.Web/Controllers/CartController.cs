@@ -57,8 +57,9 @@ public class CartController : Controller
     public async Task<IActionResult> Index()
     {
         var cart = await GetOrCreateCartWithCookieAsync();
+        var summary = await _cartServices.GetCartSummaryAsync(cart.CartToken);
         
-        return View(cart);
+        return View(summary);
     }
 
     [HttpPost("/cart/add")]

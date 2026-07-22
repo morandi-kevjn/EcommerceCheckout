@@ -1,18 +1,18 @@
-@model EcommerceCheckout.Web.Models.Entities.Cart
+@model EcommerceCheckout.Web.Models.ViewModels.CartSummary
 
 <h1>Carello:</h1>
-<p>Token: @Model.CartToken</p>
+<p>Token: @Model.Cart.CartToken</p>
 
 <div id="cart-alert" style="color: red;"></div>
 
-@if (!Model.Items.Any())
+@if (!Model.Cart.Items.Any())
 {
     <p>Il carello é vuoto.</p>
 }
 else
 {
     <ul>
-        @foreach (var item in Model.Items)
+        @foreach (var item in Model.Cart.Items)
         {
             <li data-product-id="@item.ProductId">
                 @item.Product.Name - 
@@ -28,6 +28,13 @@ else
     <div>
         <input type="text" id="coupon-code" placeholder="Inserisci codice coupon" />
         <button id="apply-coupon-btn">Applica Coupon</button>
+    </div>
+    
+    <div>
+        <p>Subtotale: <span id="cart-subtotal">@Model.Subtotal.ToString("C")</span></p>
+        <p>Sconto: <span id="cart-discount">@Model.Discount.ToString("C")</span></p>
+        <p>Totale: <span id="cart-total">@Model.Total.ToString("C")</span></p>
+        <button id="checkout-btn">Procedi al Checkout</button>
     </div>
 }
 

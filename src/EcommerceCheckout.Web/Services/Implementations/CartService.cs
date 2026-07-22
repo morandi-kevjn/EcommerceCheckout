@@ -1,5 +1,6 @@
 using EcommerceCheckout.Web.Data;
 using EcommerceCheckout.Web.Models.Entities;
+using EcommerceCheckout.Web.Models.ViewModels;
 using EcommerceCheckout.Web.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -129,5 +130,31 @@ public class CartService : ICartServices
         await _db.SaveChangesAsync();
         
         return (true, null);
+    }
+
+    public async Task<CartSummary> GetCartSummaryAsync(Guid cartToken)
+    {
+        var cart = await GetOrCreateCartAsync(cartToken);
+        var subtotal = cart.Items.Sum(i => i.UnitPrice * i.Quantity);
+        decimal discount = 0;
+
+        if (cart.CouponId is not null)
+        {
+            var coupon = await _db.Coupons.FindAsync(cart.CouponId);
+            if (coupon is not null)
+            {
+                var (isValid, discountAmount, _) = await _couponService.ValidateAndComputeDiscountAsync(coupon.Code, subtotal);
+                
+                if (isValid)
+                    discount = discountAmount;
+            }
+        }
+
+        return new CartSummary
+        {
+            Cart = cart,
+            Subtotal = subtotal,
+            Discount = discount
+        };
     }
 }

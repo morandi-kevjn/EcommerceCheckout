@@ -1,4 +1,5 @@
 using EcommerceCheckout.Web.Models.Entities;
+using EcommerceCheckout.Web.Models.ViewModels;
 
 namespace EcommerceCheckout.Web.Services.Interfaces;
 
@@ -9,4 +10,5 @@ public interface ICartServices
     Task UpdateQuantityAsync(Guid cartToken, int productId, int newQuantity);
     Task RemoveItemAsync(Guid cartToken, int productId);
     Task<(bool Success, string? ErrorMessage)> ApplyCouponAsync(Guid cartToken, string couponCode);
+    Task<CartSummary> GetCartSummaryAsync(Guid cartToken);
 }
