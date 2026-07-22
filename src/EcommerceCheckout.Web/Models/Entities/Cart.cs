@@ -15,6 +15,9 @@ public class Cart
     public int? CustomerId { get; set; }
     public Customer? Customer { get; set; }
     
+    public int? CouponId { get; set; }
+    public Coupon? Coupon { get; set; }
+    
     public CartStatus Status { get; set; } = CartStatus.Open;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
