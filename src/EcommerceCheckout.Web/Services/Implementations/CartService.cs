@@ -8,10 +8,12 @@ namespace EcommerceCheckout.Web.Services.Implementations;
 public class CartService : ICartServices
 {
     private readonly ApplicationDbContext _db;
+    private readonly ICouponService _couponService;
 
-    public CartService(ApplicationDbContext db)
+    public CartService(ApplicationDbContext db, ICouponService couponService)
     {
         _db = db;
+        _couponService = couponService;
     }
     
     public async Task<Cart> GetOrCreateCartAsync(Guid? cartToken)
@@ -110,5 +112,22 @@ public class CartService : ICartServices
             _db.CartItems.Remove(item);
             await _db.SaveChangesAsync();
         }
+    }
+    
+    public async Task<(bool Success, string? ErrorMessage)> ApplyCouponAsync(Guid cartToken, string couponCode)
+    {
+        var cart = await GetOrCreateCartAsync(cartToken);
+        var subtotal = cart.Items.Sum(i => i.UnitPrice * i.Quantity);
+        
+        var (isValid, _, errorMessage) = await _couponService.ValidateAndComputeDiscountAsync(couponCode, subtotal);
+        
+        if (!isValid)
+            return (false, errorMessage);
+        
+        var coupon = await _db.Coupons.FirstAsync(c => c.Code.ToUpper() == couponCode.ToUpperInvariant());
+        cart.CouponId = coupon.Id;
+        await _db.SaveChangesAsync();
+        
+        return (true, null);
     }
 }

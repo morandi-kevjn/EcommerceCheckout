@@ -17,12 +17,19 @@ public class CartServiceTest
         return new ApplicationDbContext(options);
     }
 
+    private static (ApplicationDbContext Db, CartService Sut) CreateSut()
+    {
+        var db = CreateInMemoryDb();
+        var couponService = new CouponService(db);
+        var sut = new CartService(db, couponService);
+        return (db, sut);
+    }
+
     [Fact]
     public async Task GetOrCreateCartAsync_creates_new_cart_when_token_not_found()
     {
         // Arrange
-        var db = CreateInMemoryDb();
-        var sut = new CartService(db);
+        var (db, sut) = CreateSut();
         var token = Guid.NewGuid();
 
         // Act
@@ -37,14 +44,12 @@ public class CartServiceTest
     public async Task GetOrCreateCartAsync_returns_cart_when_token_found()
     {
         // Arrange
-        var db = CreateInMemoryDb();
+        var (db, sut) = CreateSut();
         var token = Guid.NewGuid();
 
         var existingCart = new Cart { CartToken = token };
         db.Carts.Add(existingCart);
         await db.SaveChangesAsync();
-
-        var sut = new CartService(db);
         
         // Act
         var cart = await sut.GetOrCreateCartAsync(token);
