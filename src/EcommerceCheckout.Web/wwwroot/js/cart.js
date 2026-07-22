@@ -33,4 +33,21 @@ document.addEventListener('click', async function (evt) {
         
         location.reload();
     }
+    
+    if (target.id === 'apply-coupon-btn') {
+        const code = document.getElementById('coupon-code').value;
+        
+        const response = await fetch('/cart/coupon/apply', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({couponCode: code})
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            location.reload();
+        } else {
+            document.getElementById('cart-alert').textContent = result.message;
+        }
+    }
 });

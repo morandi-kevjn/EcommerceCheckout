@@ -17,7 +17,8 @@ public class CartController : Controller
     public record AddItemRequest(int ProductId, int Quantity);
     public record UpdateQuantityRequest(int ProductId, int Quantity);
     public record RemoveItemRequest(int ProductId);
-
+    public record ApplycouponRequest(string CouponCode);
+    
     private Guid? CheckToken(Guid? existingToken)
     {
         if (Request.Cookies.TryGetValue("cartToken", out var raw) && Guid.TryParse(raw, out var parsed))
@@ -99,5 +100,14 @@ public class CartController : Controller
         await _cartServices.RemoveItemAsync(cart.CartToken, request.ProductId);
         
         return Json(new CartAjaxResponse(true, null));
+    }
+
+    [HttpPost("/cart/coupon/apply")]
+    public async Task<IActionResult> ApplyCoupon([FromBody] ApplycouponRequest request)
+    {
+        var cart = await GetOrCreateCartWithCookieAsync();
+        var (success, errorMessage) = await _cartServices.ApplyCouponAsync(cart.CartToken, request.CouponCode);
+        
+        return Json(new CartAjaxResponse(success, errorMessage));
     }
 }
