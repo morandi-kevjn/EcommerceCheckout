@@ -13,6 +13,11 @@ public class CartController : Controller
         _cartServices = cartServices;
     }
 
+    public record CartAjaxResponse(bool Success, string? Message, object? Cart = null);
+    public record AddItemRequest(int ProductId, int Quantity);
+    public record UpdateQuantityRequest(int ProductId, int Quantity);
+    public record RemoveItemRequest(int ProductId);
+
     private Guid? CheckToken(Guid? existingToken)
     {
         if (Request.Cookies.TryGetValue("cartToken", out var raw) && Guid.TryParse(raw, out var parsed))
@@ -55,30 +60,44 @@ public class CartController : Controller
         return View(cart);
     }
 
-    [HttpGet("/cart/add")]
-    public async Task<IActionResult> AddItem(int productId, int quantity = 1)
+    [HttpPost("/cart/add")]
+    public async Task<IActionResult> AddItem([FromBody] AddItemRequest request)
     {
         var cart = await GetOrCreateCartWithCookieAsync();
-        await _cartServices.AddItemAsync(cart.CartToken, productId, quantity);
-        
-        return RedirectToAction(nameof(Index));
+
+        try
+        {
+            await _cartServices.AddItemAsync(cart.CartToken, request.ProductId, request.Quantity);
+            return Json(new CartAjaxResponse(true, null));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new CartAjaxResponse(false, ex.Message));
+        }
     }
 
-    [HttpGet("/cart/update")]
-    public async Task<IActionResult> UpdateQuantity(int productId, int quantity)
+    [HttpPost("/cart/update")]
+    public async Task<IActionResult> UpdateQuantity([FromBody] UpdateQuantityRequest request)
     {
         var cart = await GetOrCreateCartWithCookieAsync();
-        await _cartServices.UpdateQuantityAsync(cart.CartToken, productId, quantity);
-        
-        return RedirectToAction(nameof(Index));
+
+        try
+        {
+            await _cartServices.UpdateQuantityAsync(cart.CartToken, request.ProductId, request.Quantity);
+            return Json(new CartAjaxResponse(true, null));
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Json(new CartAjaxResponse(false, ex.Message));
+        }
     }
 
-    [HttpGet("/cart/remove")]
-    public async Task<IActionResult> RemoveItem(int productId)
+    [HttpPost("/cart/remove")]
+    public async Task<IActionResult> RemoveItem([FromBody] RemoveItemRequest request)
     {
         var cart = await GetOrCreateCartWithCookieAsync();
-        await _cartServices.RemoveItemAsync(cart.CartToken, productId);
+        await _cartServices.RemoveItemAsync(cart.CartToken, request.ProductId);
         
-        return RedirectToAction(nameof(Index));
+        return Json(new CartAjaxResponse(true, null));
     }
 }
