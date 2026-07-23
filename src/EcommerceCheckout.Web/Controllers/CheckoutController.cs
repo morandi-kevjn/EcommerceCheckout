@@ -10,12 +10,14 @@ public class CheckoutController : Controller
     private readonly ICartServices _cartServices;
     private readonly ICartCookiesAccessor _cartCookiesAccessor;
     private readonly IOrderService _orderService;
+    private readonly IPaymentService _paymentService;
 
-    public CheckoutController(ICartServices cartServices, ICartCookiesAccessor cartCookiesAccessor, IOrderService orderService)
+    public CheckoutController(ICartServices cartServices, ICartCookiesAccessor cartCookiesAccessor, IOrderService orderService, IPaymentService paymentService)
     {
         _cartServices = cartServices;
         _cartCookiesAccessor = cartCookiesAccessor;
         _orderService = orderService;
+        _paymentService = paymentService;
     }
 
     [HttpGet("/checkout")]
@@ -57,14 +59,17 @@ public class CheckoutController : Controller
         
         var order = await _orderService.CreateOrderFromCartAsync(existingToken.Value, userInfo, paymentType);
         
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        var successUrl = $"{baseUrl}/payment/stripe/return?orderNumber={order.OrderNumber}";
+        var cancelUrl = $"{baseUrl}/checkout/cancelled";
+        
+        var initResult = await _paymentService.CreatePaymentAsync(order, successUrl, cancelUrl);
+        
         HttpContext.Session.Remove(UserInfoController.SessionKey);
         
-        return RedirectToAction("Success", new { orderNumber = order.OrderNumber });
+        return Redirect(initResult.RedirectUrl);
     }
 
-    [HttpGet("/checkout/success")]
-    public IActionResult Success(string orderNumber)
-    {
-        return Content($"Ordine {orderNumber} creato con successo!");
-    }
+    [HttpGet("/checkout/cancelled")] 
+    public IActionResult Cancelled() => Content("Pagamento annullato.");
 }

@@ -87,4 +87,12 @@ public class OrderService : IOrderService
         await _db.SaveChangesAsync();
         return order;
     }
+
+    public Task<Order?> GetByOrderNumberAsync(string orderNumber)
+    {
+        return _db.Orders
+            .Include(o => o.Items)
+            .Include(o => o.Customer)
+            .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
+    }
 }

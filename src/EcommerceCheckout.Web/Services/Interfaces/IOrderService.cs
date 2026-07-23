@@ -6,4 +6,5 @@ namespace EcommerceCheckout.Web.Services.Interfaces;
 public interface IOrderService
 {
     Task<Order> CreateOrderFromCartAsync(Guid cartToken, UserInfoInputModel userInfoInputModel, string paymentType);
+    Task<Order?> GetByOrderNumberAsync(string orderNumber);
 }
