@@ -4,36 +4,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceCheckout.Web.Controllers;
 
+public record CartAjaxResponse(bool Success, string? Message, object? Cart = null);
+public record AddItemRequest(int ProductId, int Quantity);
+public record UpdateQuantityRequest(int ProductId, int Quantity);
+public record RemoveItemRequest(int ProductId);
+public record ApplycouponRequest(string CouponCode);
+
 public class CartController : Controller
 {
     private readonly ICartServices _cartServices;
+    private readonly ICartCookiesAccessor _cartCookiesAccessor;
 
-    public CartController(ICartServices cartServices)
+    public CartController(ICartServices cartServices, ICartCookiesAccessor cartCookiesAccessor)
     {
         _cartServices = cartServices;
-    }
-
-    public record CartAjaxResponse(bool Success, string? Message, object? Cart = null);
-    public record AddItemRequest(int ProductId, int Quantity);
-    public record UpdateQuantityRequest(int ProductId, int Quantity);
-    public record RemoveItemRequest(int ProductId);
-    public record ApplycouponRequest(string CouponCode);
-    
-    private Guid? CheckToken(Guid? existingToken)
-    {
-        if (Request.Cookies.TryGetValue("cartToken", out var raw) && Guid.TryParse(raw, out var parsed))
-        {
-            existingToken = parsed;
-        }
-        
-        return existingToken;
+        _cartCookiesAccessor = cartCookiesAccessor;
     }
 
     private async Task<Cart> GetOrCreateCartWithCookieAsync()
     {
         // 1. Leggo il cookie, se esiste
-        Guid? existingToken = null;
-        existingToken = CheckToken(existingToken);
+        Guid? existingToken = _cartCookiesAccessor.ReadToken(Request);
         
         // 2. Ottengo (o creo) il carrello
         var cart = await _cartServices.GetOrCreateCartAsync(existingToken);
@@ -41,15 +32,9 @@ public class CartController : Controller
         // 3. Se il token era nuovo (o diverso da quello letto), scrivo il cookie
         if (existingToken != cart.CartToken)
         {
-            Response.Cookies.Append("cartToken", cart.CartToken.ToString(), new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = Request.IsHttps, // set to True only if we are in https
-                SameSite = SameSiteMode.Lax,
-                Expires = DateTimeOffset.UtcNow.AddDays(30)
-            });
+            _cartCookiesAccessor.WriteToken(Response, cart.CartToken, Request.IsHttps);
         }
-        
+
         return cart;
     }
 
