@@ -4,17 +4,17 @@ namespace EcommerceCheckout.Web.Models.ViewModels;
 
 public class UserInfoInputModel
 {
-    [Required(ErrorMessage = "First Name is required")]
+    [Required(ErrorMessage = "Il nome é obbligatorio")]
     public string FirstName { get; set; } = string.Empty;
     
-    [Required(ErrorMessage = "Last Name is required")]
+    [Required(ErrorMessage = "Il cognome é obbligatorio")]
     public string LastName { get; set; }  = string.Empty;
     
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress(ErrorMessage = "Invalid Email Address")]
+    [Required(ErrorMessage = "L'email é obbligatoria")]
+    [EmailAddress(ErrorMessage = "Indirizzo Email non valido")]
     public string Email { get; set; } = string.Empty;
     
-    [Required(ErrorMessage = "Nation is required")]
+    [Required(ErrorMessage = "La nazione é obbligatoria")]
     public string Nation { get; set; } = string.Empty;
 
     public bool Newsletter { get; set; } = false;
@@ -23,7 +23,7 @@ public class UserInfoInputModel
     public string? FiscalTaxNumber { get; set; }
     public string? FiscalCodeNUmber { get; set; }
     
-    [Required(ErrorMessage = "Privacy Policy is required")]
-    [Range(typeof(bool), "true", "true", ErrorMessage = "Privacy Policy is invalid")]
+    [Required(ErrorMessage = "La policy sulla privacy é obbligatoria")]
+    [Range(typeof(bool), "true", "true", ErrorMessage = "Devi accettare l'informativa sulla privacy")]
     public bool PrivacyAccepted { get; set; }
 }

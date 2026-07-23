@@ -1,0 +1,38 @@
+@model EcommerceCheckout.Web.Models.ViewModels.CheckoutPageViewModel
+
+<h1>Checkout</h1>
+
+<section>
+    <h2>Dati personali</h2>
+    <p>@Model.UserInfo.FirstName @Model.UserInfo.LastName</p>
+    <p>@Model.UserInfo.Email</p>
+    <p>@Model.UserInfo.Nation</p>
+    <p>@(Model.UserInfo.Invoice ? "Fattura richiesta" : "Nessuna fattura richiesta")</p>
+    <a href="/user-info">Modifica dati</a>
+</section>
+
+<section>
+    <h2>Riepilogo carrello</h2>
+    <ul>
+        @foreach (var item in Model.Cart.Cart.Items)
+        {
+            <li>@item.Product.Name - Quantitá: @item.Quantity.ToString("C") - Prezzo: @item.UnitPrice.ToString("C")</li>
+        }
+    </ul>
+    <p>Subtotale: @Model.Cart.Subtotal.ToString("C")</p>
+    <p>Sconto: @Model.Cart.Discount.ToString("C")</p>
+    <p>Totale: @Model.Cart.Total.ToString("C")</p>
+</section>
+
+<form asp-controller="Checkout" asp-action="Index" method="post">
+    <section>
+        <h2>Metodo di pagamento</h2>
+        <input type="radio" name="PaymentType" value="paypal" id="pay-paypal"/>
+        <label for="pay-paypal">PayPal</label>
+        
+        <input type="radio" name="PaymentType" value="stripe" id="pay-stripe"/>
+        <label for="pay-stripe">Stripe</label>
+    </section>
+    
+    <button type="submit">Procedi al pagamento</button>
+</form>
