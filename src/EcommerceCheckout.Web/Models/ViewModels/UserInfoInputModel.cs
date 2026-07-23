@@ -21,7 +21,7 @@ public class UserInfoInputModel
     public bool Invoice { get; set; } = false;
     
     public string? FiscalTaxNumber { get; set; }
-    public string? FiscalCodeNUmber { get; set; }
+    public string? FiscalCodeNumber { get; set; }
     
     [Required(ErrorMessage = "La policy sulla privacy é obbligatoria")]
     [Range(typeof(bool), "true", "true", ErrorMessage = "Devi accettare l'informativa sulla privacy")]

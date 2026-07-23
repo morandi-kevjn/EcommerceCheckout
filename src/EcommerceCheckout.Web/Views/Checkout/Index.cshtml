@@ -16,7 +16,7 @@
     <ul>
         @foreach (var item in Model.Cart.Cart.Items)
         {
-            <li>@item.Product.Name - Quantitá: @item.Quantity.ToString("C") - Prezzo: @item.UnitPrice.ToString("C")</li>
+            <li>@item.Product.Name - Quantitá: @item.Quantity.ToString() - Prezzo: @item.UnitPrice.ToString("C")</li>
         }
     </ul>
     <p>Subtotale: @Model.Cart.Subtotal.ToString("C")</p>

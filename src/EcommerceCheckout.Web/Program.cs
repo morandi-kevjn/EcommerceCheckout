@@ -14,6 +14,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<ICartServices, CartService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<ICartCookiesAccessor, CartCookieAccessor>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
