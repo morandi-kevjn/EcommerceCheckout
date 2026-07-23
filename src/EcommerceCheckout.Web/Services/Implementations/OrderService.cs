@@ -71,7 +71,7 @@ public class OrderService : IOrderService
             Currency = "EUR",
             Status = OrderStatus.PendingPayment,
             PaymentProvider = paymentProvider,
-            OrderItems = cart.Items.Select(i => new OrderItem
+            Items = cart.Items.Select(i => new OrderItem
             {
                 ProductId = i.ProductId,
                 ProductName = i.Product.Name,

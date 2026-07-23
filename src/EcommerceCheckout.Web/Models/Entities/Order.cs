@@ -39,7 +39,7 @@ public class Order
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? PaidAt { get; set; }
 
-    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 }
 
 public class OrderItem
