@@ -1,0 +1,58 @@
+@model EcommerceCheckout.Web.Models.ViewModels.UserInfoInputModel
+
+<h1>Informazioni Utente</h1>
+
+<form asp-controller="UserInfo" asp-action="Index" method="post">
+    <div asp-validation-summary="ModelOnly" style="color: red;"></div>
+    
+    <div>
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" />
+        <span asp-validation-for="FirstName" style="color: red;"></span>
+    </div>
+    
+    <div>
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" />
+        <span asp-validation-for="LastName" style="color: red;"></span>
+    </div>
+    
+    <div>
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email" style="color: red;"></span>
+    </div>
+    
+    <div>
+        <label asp-for="Nation"></label>
+        <select asp-for="Nation">
+            <option value="">Seleziona una nazione</option>
+            <option value="IT">Italia</option>
+            <option value="USA">USA</option>
+        </select>
+        <span asp-validation-for="Nation" style="color: red;"></span>
+    </div>
+    
+    <div>
+        <input asp-for="Newsletter" />
+        <label asp-for="Newsletter">Iscriviti alla newsletter</label>
+    </div>
+    
+    <div>
+        <input asp-for="Invoice" />
+        <label asp-for="Invoice">Richiedi fattura</label>
+    </div>
+    
+    <div>
+        <label asp-for="FiscalTaxNumber">Partita Iva</label>
+        <input asp-for="FiscalTaxNumber" />
+    </div>
+    
+    <div>
+        <input asp-for="PrivacyAccepted"/>
+        <label asp-for="PrivacyAccepted">Accetto la privacy policy</label>
+        <span asp-validation-for="PrivacyAccepted" style="color: red;"></span>
+    </div>
+    
+    <button type="submit">Procedi</button>
+</form>
