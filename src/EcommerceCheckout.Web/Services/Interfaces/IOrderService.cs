@@ -7,4 +7,5 @@ public interface IOrderService
 {
     Task<Order> CreateOrderFromCartAsync(Guid cartToken, UserInfoInputModel userInfoInputModel, string paymentType);
     Task<Order?> GetByOrderNumberAsync(string orderNumber);
+    Task MarkAsPaidAsync(Order order);
 }

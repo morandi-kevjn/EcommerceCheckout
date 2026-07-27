@@ -21,27 +21,46 @@ public class StripePaymentService : IPaymentService
     {
         StripeConfiguration.ApiKey = _secretKey;
 
+        var lineItems = order.Items.Select(item => new SessionLineItemOptions
+        {
+            Quantity = item.Quantity,
+            PriceData = new SessionLineItemPriceDataOptions
+            {
+                Currency = order.Currency.ToLowerInvariant(),
+                UnitAmount = (long)Math.Round(item.UnitPrice * 100, MidpointRounding.AwayFromZero),
+                ProductData = new SessionLineItemPriceDataProductDataOptions
+                {
+                    Name = item.ProductName,
+                }
+            }
+        }).ToList();
+        
         var options = new SessionCreateOptions
         {
             Mode = "payment",
             PaymentMethodTypes = new List<string> { "card" },
-            LineItems = order.Items.Select(item => new SessionLineItemOptions
-            {
-                Quantity = item.Quantity,
-                PriceData = new SessionLineItemPriceDataOptions
-                {
-                    Currency = order.Currency.ToLowerInvariant(),
-                    UnitAmount = (long)Math.Round(item.UnitPrice * 100, MidpointRounding.AwayFromZero),
-                    ProductData = new SessionLineItemPriceDataProductDataOptions
-                    {
-                        Name = item.ProductName,
-                    }
-                }
-            }).ToList(),
-            SuccessUrl = successUrl + "?session_id={CHECKOUT_SESSION_ID}",
+            LineItems = lineItems,
+            SuccessUrl = successUrl + "&session_id={CHECKOUT_SESSION_ID}",
             CancelUrl = cancelUrl,
             ClientReferenceId = order.OrderNumber
         };
+
+        if (order.DiscountAmount > 0)
+        {
+            var couponService = new Stripe.CouponService();
+            var stripeCoupon = await couponService.CreateAsync(new CouponCreateOptions
+            {
+                AmountOff = (long)Math.Round(order.DiscountAmount * 100, MidpointRounding.AwayFromZero),
+                Currency = order.Currency.ToLowerInvariant(),
+                Duration = "once",
+                Name = "Sconto coupon"
+            });
+
+            options.Discounts = new List<SessionDiscountOptions>
+            {
+                new SessionDiscountOptions { Coupon = stripeCoupon.Id }
+            };
+        }
 
         var service = new SessionService();
         Session session = await service.CreateAsync(options);

@@ -57,6 +57,18 @@ public class CheckoutController : Controller
         if (existingToken is null)
             return RedirectToAction("Index", "Cart");
         
+        if (string.IsNullOrEmpty(paymentType))
+        {
+            ModelState.AddModelError("PaymentType", "Seleziona un metodo di pagamento.");
+            
+            var cartSummary = await _cartServices.GetCartSummaryAsync(existingToken.Value);
+            return View(new CheckoutPageViewModel
+            {
+                UserInfo = userInfo,
+                Cart = cartSummary
+            });
+        }
+        
         var order = await _orderService.CreateOrderFromCartAsync(existingToken.Value, userInfo, paymentType);
         
         var baseUrl = $"{Request.Scheme}://{Request.Host}";
@@ -68,6 +80,12 @@ public class CheckoutController : Controller
         HttpContext.Session.Remove(UserInfoController.SessionKey);
         
         return Redirect(initResult.RedirectUrl);
+    }
+
+    [HttpGet("/checkout/success")]
+    public IActionResult Success(string orderNumber)
+    {
+        return Content($"Ordine {orderNumber} creato e pagato con sucesso!");
     }
 
     [HttpGet("/checkout/cancelled")] 

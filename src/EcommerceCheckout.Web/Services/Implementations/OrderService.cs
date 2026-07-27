@@ -95,4 +95,14 @@ public class OrderService : IOrderService
             .Include(o => o.Customer)
             .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
     }
+
+    public async Task MarkAsPaidAsync(Order order)
+    {
+        if (order is null)
+            throw new ArgumentNullException(nameof(order));
+        
+        order.Status = OrderStatus.Paid;
+        order.PaidAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+    }
 }
