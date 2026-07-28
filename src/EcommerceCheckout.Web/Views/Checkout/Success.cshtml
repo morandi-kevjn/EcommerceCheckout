@@ -1,0 +1,15 @@
+@model EcommerceCheckout.Web.Models.Entities.Order
+
+<div class="text-center py-5">
+    <i class="fa-solid fa-circle-check text-success" style="font-size: 4rem;"></i>
+    <h1 class="h2 mt-3">Grazie per il tuo acquisto!</h1>
+    <p class="lead">Il tuo ordine <strong>@Model.OrderNumber</strong> è stato pagato con successo.</p>
+    <p>Totale pagato: <strong>@Model.TotalAmount.ToString("C")</strong></p>
+
+    @if (Model.Customer?.RequiresInvoice == true)
+    {
+    <p class="text-muted">La fattura sarà disponibile a breve.</p>
+    }
+
+    <a href="/cart" class="btn btn-success mt-3">Torna al negozio</a>
+</div>

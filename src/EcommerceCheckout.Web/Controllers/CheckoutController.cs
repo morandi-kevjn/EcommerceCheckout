@@ -83,11 +83,15 @@ public class CheckoutController : Controller
     }
 
     [HttpGet("/checkout/success")]
-    public IActionResult Success(string orderNumber)
+    public async Task<IActionResult> Success(string orderNumber)
     {
-        return Content($"Ordine {orderNumber} creato e pagato con sucesso!");
+        var order = await _orderService.GetByOrderNumberAsync(orderNumber);
+        if (order is null)
+            return RedirectToAction("Index", "Cart");
+        
+        return View(order);
     }
 
     [HttpGet("/checkout/cancelled")] 
-    public IActionResult Cancelled() => Content("Pagamento annullato.");
+    public IActionResult Cancelled() => View();
 }
