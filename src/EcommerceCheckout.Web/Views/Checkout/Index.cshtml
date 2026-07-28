@@ -1,38 +1,66 @@
 @model EcommerceCheckout.Web.Models.ViewModels.CheckoutPageViewModel
 
-<h1>Checkout</h1>
+<h1 class="h3 mb-4">Checkout</h1>
 
-<section>
-    <h2>Dati personali</h2>
-    <p>@Model.UserInfo.FirstName @Model.UserInfo.LastName</p>
-    <p>@Model.UserInfo.Email</p>
-    <p>@Model.UserInfo.Nation</p>
-    <p>@(Model.UserInfo.Invoice ? "Fattura richiesta" : "Nessuna fattura richiesta")</p>
-    <a href="/user-info">Modifica dati</a>
-</section>
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="h5">Dati personali</h2>
+        <p class="mb-1">@Model.UserInfo.FirstName @Model.UserInfo.LastName</p>
+        <p class="mb-1">@Model.UserInfo.Email</p>
+        <p class="mb-1">@Model.UserInfo.Nation</p>
+        <p class="mb-0">@(Model.UserInfo.Invoice ? "Fattura richiesta" : "Nessuna fattura richiesta")</p>
+        <a href="/user-info" class="small">Modifica dati</a>
+    </div>
+</div>
 
-<section>
-    <h2>Riepilogo carrello</h2>
-    <ul>
-        @foreach (var item in Model.Cart.Cart.Items)
-        {
-            <li>@item.Product.Name - Quantitá: @item.Quantity.ToString() - Prezzo: @item.UnitPrice.ToString("C")</li>
-        }
-    </ul>
-    <p>Subtotale: @Model.Cart.Subtotal.ToString("C")</p>
-    <p>Sconto: @Model.Cart.Discount.ToString("C")</p>
-    <p>Totale: @Model.Cart.Total.ToString("C")</p>
-</section>
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="h5">Riepilogo carrello</h2>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr><th>Prodotto</th><th class="text-end">Prezzo</th><th class="text-center">Qtà</th><th class="text-end">Totale</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Cart.Cart.Items)
+                    {
+                        <tr>
+                            <td>@item.Product.Name</td>
+                            <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                            <td class="text-center">@item.Quantity</td>
+                            <td class="text-end">@((item.UnitPrice * item.Quantity).ToString("C"))</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    @if (Model.Cart.Discount > 0)
+                    {
+                        <tr><td colspan="3" class="text-end">Sconto</td><td class="text-end text-success">-@Model.Cart.Discount.ToString("C")</td></tr>
+                    }
+                    <tr class="fw-bold"><td colspan="3" class="text-end">Totale</td><td class="text-end">@Model.Cart.Total.ToString("C")</td></tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
 
 <form asp-controller="Checkout" asp-action="Index" method="post">
-    <section>
-        <h2>Metodo di pagamento</h2>
-        <input type="radio" name="PaymentType" value="paypal" id="pay-paypal"/>
-        <label for="pay-paypal">PayPal</label>
-        
-        <input type="radio" name="PaymentType" value="stripe" id="pay-stripe"/>
-        <label for="pay-stripe">Stripe</label>
-    </section>
-    
-    <button type="submit">Procedi al pagamento</button>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5 mb-3">Metodo di pagamento</h2>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="PaymentType" value="stripe" id="pay-stripe" required />
+                <label class="form-check-label" for="pay-stripe">Carta / Stripe</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="PaymentType" value="paypal" id="pay-paypal" required />
+                <label class="form-check-label" for="pay-paypal">PayPal</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a class="btn btn-outline-secondary" href="/user-info">Indietro</a>
+        <button type="submit" class="btn btn-success">Procedi al pagamento</button>
+    </div>
 </form>
