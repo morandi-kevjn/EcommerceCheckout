@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceCheckout.Web.Controllers;
 
-public class SaticPagesController : Controller
+public class StaticPagesController : Controller
 {
     [HttpGet("/terms")]
     public IActionResult Terms() => View();

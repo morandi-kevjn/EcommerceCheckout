@@ -38,6 +38,7 @@ public class CartController : Controller
         return cart;
     }
 
+    [HttpGet("/")]
     [HttpGet("/cart")]
     public async Task<IActionResult> Index()
     {
