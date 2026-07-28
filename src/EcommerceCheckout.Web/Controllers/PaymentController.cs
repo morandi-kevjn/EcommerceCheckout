@@ -8,11 +8,13 @@ public class PaymentController : Controller
 {
     private readonly IOrderService _orderService;
     private readonly IPaymentService _paymentService;
+    private readonly ICartCookiesAccessor  _cartCookieAccessor;
 
-    public PaymentController(IOrderService orderService, IPaymentService paymentService)
+    public PaymentController(IOrderService orderService, IPaymentService paymentService, ICartCookiesAccessor cartCookieAccessor)
     {
         _orderService = orderService;
         _paymentService = paymentService;
+        _cartCookieAccessor = cartCookieAccessor;
     }
 
     [HttpGet("/payment/stripe/return")]
@@ -27,7 +29,7 @@ public class PaymentController : Controller
         if (confirmed)
         {
             await _orderService.MarkAsPaidAsync(order);
-            
+            _cartCookieAccessor.ClearToken(Response);
             return RedirectToAction("Success", "Checkout", new { orderNumber = order.OrderNumber });
         }
 

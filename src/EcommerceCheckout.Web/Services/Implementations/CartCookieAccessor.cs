@@ -24,4 +24,9 @@ public class CartCookieAccessor : ICartCookiesAccessor
             Expires = DateTimeOffset.UtcNow.AddDays(30)
         });
     }
+
+    public void ClearToken(HttpResponse response)
+    {
+        response.Cookies.Delete("cart_token");
+    }
 }
