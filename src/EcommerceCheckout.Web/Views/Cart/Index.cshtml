@@ -1,44 +1,92 @@
 @model EcommerceCheckout.Web.Models.ViewModels.CartSummary
 
-<h1>Carello:</h1>
-<p>Token: @Model.Cart.CartToken</p>
+<h1 class="h3 mb-4">Carrello</h1>
 
-<div id="cart-alert" style="color: red;"></div>
+<div id="cart-alert" class="alert alert-danger d-none" role="alert"></div>
 
 @if (!Model.Cart.Items.Any())
 {
-    <p>Il carello é vuoto.</p>
+    <p class="text-muted">Il carrello è vuoto.</p>
 }
 else
 {
-    <ul>
+    <!-- Tabella per desktop -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Prodotto</th>
+                    <th class="text-end">Prezzo</th>
+                    <th class="text-center" style="width:160px;">Quantità</th>
+                    <th class="text-end">Totale</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Cart.Items)
+                {
+                    <tr data-product-id="@item.ProductId">
+                        <td>@item.Product.Name</td>
+                        <td class="text-end">@item.UnitPrice.ToString("C")</td>
+                        <td class="text-center">
+                            <div class="input-group input-group-sm justify-content-center" style="max-width:130px;margin:0 auto;">
+                                <button type="button" class="btn btn-outline-secondary qty-minus" data-product-id="@item.ProductId">-</button>
+                                <span class="input-group-text qty-value" data-product-id="@item.ProductId">@item.Quantity</span>
+                                <button type="button" class="btn btn-outline-secondary qty-plus" data-product-id="@item.ProductId">+</button>
+                            </div>
+                        </td>
+                        <td class="text-end">@((item.UnitPrice * item.Quantity).ToString("C"))</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-danger qty-remove" data-product-id="@item.ProductId">&times;</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Card per mobile -->
+    <div class="d-block d-md-none">
         @foreach (var item in Model.Cart.Items)
         {
-            <li data-product-id="@item.ProductId">
-                @item.Product.Name - 
-                Quantità: <span class="qty-value">@item.Quantity</span> - 
-                Prezzo: <span class="qty-price">@item.UnitPrice</span>
-                <button class="qty-minus" data-product-id="@item.ProductId">-</button>
-                <button class="qty-plus" data-product-id="@item.ProductId">+</button>
-                <button class="qty-remove" data-product-id="@item.ProductId">Rimuovi</button>
-            </li>
+            <div class="card mb-2" data-product-id="@item.ProductId">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h2 class="h6">@item.Product.Name</h2>
+                        <button type="button" class="btn btn-sm btn-outline-danger qty-remove" data-product-id="@item.ProductId">&times;</button>
+                    </div>
+                    <p class="mb-1 text-muted">Prezzo: @item.UnitPrice.ToString("C")</p>
+                    <div class="input-group input-group-sm mb-2" style="max-width:130px;">
+                        <button type="button" class="btn btn-outline-secondary qty-minus" data-product-id="@item.ProductId">-</button>
+                        <span class="input-group-text qty-value" data-product-id="@item.ProductId">@item.Quantity</span>
+                        <button type="button" class="btn btn-outline-secondary qty-plus" data-product-id="@item.ProductId">+</button>
+                    </div>
+                    <p class="mb-0 fw-bold">Totale: @((item.UnitPrice * item.Quantity).ToString("C"))</p>
+                </div>
+            </div>
         }
-    </ul>
-    
-    <div>
-        <input type="text" id="coupon-code" placeholder="Inserisci codice coupon" />
-        <button id="apply-coupon-btn">Applica Coupon</button>
     </div>
-    
-    <div>
-        <p>Subtotale: <span id="cart-subtotal">@Model.Subtotal.ToString("C")</span></p>
-        <p>Sconto: <span id="cart-discount">@Model.Discount.ToString("C")</span></p>
-        <p>Totale: <span id="cart-total">@Model.Total.ToString("C")</span></p>
-        <a href="/user-info" id="checkout-btn">Procedi al Checkout</a>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <label for="coupon-code" class="form-label">Codice coupon</label>
+            <div class="input-group">
+                <input type="text" id="coupon-code" class="form-control" placeholder="Es. WELCOME10" />
+                <button type="button" id="apply-coupon-btn" class="btn btn-primary">Applica</button>
+            </div>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <p class="mb-1">Subtotale: <strong>@Model.Subtotal.ToString("C")</strong></p>
+            @if (Model.Discount > 0)
+            {
+                <p class="mb-1 text-success">Sconto: -@Model.Discount.ToString("C")</p>
+            }
+            <p class="mb-3 fs-5">Totale: <strong>@Model.Total.ToString("C")</strong></p>
+            <a href="/user-info" class="btn btn-success">Procedi al Checkout</a>
+        </div>
     </div>
 }
 
-@section Scripts
-{
-    <script src="~/js/cart.js"></script>
+@section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
 }

@@ -1,58 +1,73 @@
 @model EcommerceCheckout.Web.Models.ViewModels.UserInfoInputModel
 
-<h1>Informazioni Utente</h1>
+<h1 class="h3 mb-4">Dati utente</h1>
 
-<form asp-controller="UserInfo" asp-action="Index" method="post">
-    <div asp-validation-summary="ModelOnly" style="color: red;"></div>
-    
-    <div>
-        <label asp-for="FirstName"></label>
-        <input asp-for="FirstName" />
-        <span asp-validation-for="FirstName" style="color: red;"></span>
+<form asp-controller="UserInfo" asp-action="Index" method="post" novalidate>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" type="email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Nation" class="form-label">Nazione</label>
+            <select asp-for="Nation" class="form-select">
+                <option value="">Seleziona</option>
+                <option value="Italy">Italia</option>
+                <option value="USA">USA</option>
+                <option value="Argentina">Argentina</option>
+            </select>
+            <span asp-validation-for="Nation" class="text-danger small"></span>
+        </div>
+
+        <div class="col-12 form-check mt-3">
+            <input asp-for="Newsletter" class="form-check-input" />
+            <label asp-for="Newsletter" class="form-check-label">Iscriviti alla newsletter</label>
+        </div>
+
+        <div class="col-12 form-check">
+            <input asp-for="Invoice" class="form-check-input" />
+            <label asp-for="Invoice" class="form-check-label">Richiedi fattura</label>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="FiscalTaxNumber" class="form-label">Partita IVA</label>
+            <input asp-for="FiscalTaxNumber" class="form-control" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="FiscalCodeNumber" class="form-label">Codice Fiscale</label>
+            <input asp-for="FiscalCodeNumber" class="form-control" />
+        </div>
+
+        <div class="col-12 form-check mt-3">
+            <input asp-for="PrivacyAccepted" class="form-check-input" />
+            <label asp-for="PrivacyAccepted" class="form-check-label">
+                Accetto la <a href="/privacy" target="_blank">privacy policy</a>
+            </label>
+            <span asp-validation-for="PrivacyAccepted" class="text-danger small"></span>
+        </div>
     </div>
-    
-    <div>
-        <label asp-for="LastName"></label>
-        <input asp-for="LastName" />
-        <span asp-validation-for="LastName" style="color: red;"></span>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <a class="btn btn-outline-secondary" href="/cart">Indietro</a>
+        <button type="submit" class="btn btn-success">Procedi</button>
     </div>
-    
-    <div>
-        <label asp-for="Email"></label>
-        <input asp-for="Email" />
-        <span asp-validation-for="Email" style="color: red;"></span>
-    </div>
-    
-    <div>
-        <label asp-for="Nation"></label>
-        <select asp-for="Nation">
-            <option value="">Seleziona una nazione</option>
-            <option value="IT">Italia</option>
-            <option value="USA">USA</option>
-        </select>
-        <span asp-validation-for="Nation" style="color: red;"></span>
-    </div>
-    
-    <div>
-        <input asp-for="Newsletter" />
-        <label asp-for="Newsletter">Iscriviti alla newsletter</label>
-    </div>
-    
-    <div>
-        <input asp-for="Invoice" />
-        <label asp-for="Invoice">Richiedi fattura</label>
-    </div>
-    
-    <div>
-        <label asp-for="FiscalTaxNumber">Partita Iva</label>
-        <input asp-for="FiscalTaxNumber" />
-    </div>
-    
-    <div>
-        <input asp-for="PrivacyAccepted"/>
-        <label asp-for="PrivacyAccepted">Accetto la privacy policy</label>
-        <span asp-validation-for="PrivacyAccepted" style="color: red;"></span>
-    </div>
-    
-    <button type="submit">Procedi</button>
 </form>
+
+@*
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+*@
