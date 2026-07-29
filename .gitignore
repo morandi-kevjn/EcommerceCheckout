@@ -12,3 +12,6 @@ obj/
 # Secrets - mai committare
 **/appsettings.*.local.json
 **/secrets.json
+
+# Env
+.env
