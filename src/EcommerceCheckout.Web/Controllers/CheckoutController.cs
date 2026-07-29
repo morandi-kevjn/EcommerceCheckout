@@ -1,5 +1,6 @@
 using System.Text.Json;
 using EcommerceCheckout.Web.Models.ViewModels;
+using EcommerceCheckout.Web.Models.Entities;
 using EcommerceCheckout.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +11,14 @@ public class CheckoutController : Controller
     private readonly ICartServices _cartServices;
     private readonly ICartCookiesAccessor _cartCookiesAccessor;
     private readonly IOrderService _orderService;
-    private readonly IPaymentService _paymentService;
+    private readonly IPaymentServiceFactory _paymentServiceFactory;
 
-    public CheckoutController(ICartServices cartServices, ICartCookiesAccessor cartCookiesAccessor, IOrderService orderService, IPaymentService paymentService)
+    public CheckoutController(ICartServices cartServices, ICartCookiesAccessor cartCookiesAccessor, IOrderService orderService, IPaymentServiceFactory paymentServiceFactory)
     {
         _cartServices = cartServices;
         _cartCookiesAccessor = cartCookiesAccessor;
         _orderService = orderService;
-        _paymentService = paymentService;
+        _paymentServiceFactory = paymentServiceFactory;
     }
 
     [HttpGet("/checkout")]
@@ -70,12 +71,14 @@ public class CheckoutController : Controller
         }
         
         var order = await _orderService.CreateOrderFromCartAsync(existingToken.Value, userInfo, paymentType);
+        var providerType = order.PaymentProvider;
         
         var baseUrl = $"{Request.Scheme}://{Request.Host}";
-        var successUrl = $"{baseUrl}/payment/stripe/return?orderNumber={order.OrderNumber}";
+        var providerSegment = providerType == PaymentProviderType.Stripe ? "stripe" : "paypal";
+        var successUrl = $"{baseUrl}/payment/{providerSegment}/return?orderNumber={order.OrderNumber}";
         var cancelUrl = $"{baseUrl}/checkout/cancelled";
-        
-        var initResult = await _paymentService.CreatePaymentAsync(order, successUrl, cancelUrl);
+
+        var initResult = await _paymentServiceFactory.Resolve(providerType).CreatePaymentAsync(order, successUrl, cancelUrl);
         
         HttpContext.Session.Remove(UserInfoController.SessionKey);
         

@@ -17,6 +17,7 @@ builder.Services.AddScoped<ICartCookiesAccessor, CartCookieAccessor>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 builder.Services.AddHttpClient<IPaymentService, PayPalPaymentService>();
+builder.Services.AddScoped<IPaymentServiceFactory, PaymentServiceFactory>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

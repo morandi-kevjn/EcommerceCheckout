@@ -7,24 +7,24 @@ namespace EcommerceCheckout.Web.Controllers;
 public class PaymentController : Controller
 {
     private readonly IOrderService _orderService;
-    private readonly IPaymentService _paymentService;
+    private readonly IPaymentServiceFactory _paymentServiceFactory;
     private readonly ICartCookiesAccessor  _cartCookieAccessor;
 
-    public PaymentController(IOrderService orderService, IPaymentService paymentService, ICartCookiesAccessor cartCookieAccessor)
+    public PaymentController(IOrderService orderService, IPaymentServiceFactory paymentServiceFactory, ICartCookiesAccessor cartCookieAccessor)
     {
         _orderService = orderService;
-        _paymentService = paymentService;
+        _paymentServiceFactory = paymentServiceFactory;
         _cartCookieAccessor = cartCookieAccessor;
     }
 
-    [HttpGet("/payment/stripe/return")]
-    public async Task<IActionResult> StripeReturn(string orderNumber, string session_id)
+    private async Task<IActionResult> ConfirmAndRedirectAsync(string orderNumber, string providerReferenceId)
     {
         var order = await _orderService.GetByOrderNumberAsync(orderNumber);
         if (order is null)
             return NotFound();
 
-        var confirmed = await _paymentService.ConfirmPaymentAsync(order, session_id);
+        var providerType = order.PaymentProvider;
+        var confirmed = await _paymentServiceFactory.Resolve(providerType).ConfirmPaymentAsync(order, providerReferenceId);
 
         if (confirmed)
         {
@@ -35,4 +35,12 @@ public class PaymentController : Controller
 
         return Content("Il pagamento non é stato confermato.");
     }
+
+    [HttpGet("/payment/stripe/return")]
+    public Task<IActionResult> StripeReturn(string orderNumber, string session_id)
+        => ConfirmAndRedirectAsync(orderNumber, session_id);
+
+    [HttpGet("/payment/paypal/return")]
+    public Task<IActionResult> PayPalReturn(string orderNumber, string token)
+        => ConfirmAndRedirectAsync(orderNumber, token);
 }
