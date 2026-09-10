@@ -1,25 +1,15 @@
-using EcommerceCheckout.Web.Data;
 using EcommerceCheckout.Web.Models.Entities;
 using EcommerceCheckout.Web.Services.Implementations;
-using Microsoft.EntityFrameworkCore;
 
 namespace EcommerceCheckout.Tests;
 
 public class CouponServiceTest
 {
-    private static ApplicationDbContext CreateInMemoryDb()
-    {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-        return new ApplicationDbContext(options);
-    }
-
     [Fact]
     public async Task ValidateAndComputeDiscountAsync_percentage_coupon_computes_correct_discount()
     {
         // Arrange
-        var db = CreateInMemoryDb();
+        var db = TestDbContextFactory.CreateInMemoryDb();
         db.Coupons.Add(new Coupon()
         {
             Code = "WELLCOME10",
@@ -45,7 +35,7 @@ public class CouponServiceTest
     public async Task ValidateAndComputeDiscountAsync_rejects_when_subtotal_below_min_price()
     {
         // Arrange
-        var db = CreateInMemoryDb();
+        var db = TestDbContextFactory.CreateInMemoryDb();
         db.Coupons.Add(new Coupon()
         {
             Code = "SAVE5",
@@ -72,7 +62,7 @@ public class CouponServiceTest
     public async Task ValidateAndComputeDiscountAsync_fixed_discount_never_exceeds_subtotal()
     {
         // Arrange
-        var db = CreateInMemoryDb();
+        var db = TestDbContextFactory.CreateInMemoryDb();
         db.Coupons.Add(new Coupon()
         {
             Code = "FIXEDAMOUNT",

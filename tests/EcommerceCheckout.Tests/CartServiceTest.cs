@@ -8,18 +8,9 @@ namespace EcommerceCheckout.Tests;
 
 public class CartServiceTest
 {
-    private static ApplicationDbContext CreateInMemoryDb()
-    {
-        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-        
-        return new ApplicationDbContext(options);
-    }
-
     private static (ApplicationDbContext Db, CartService Sut) CreateSut()
     {
-        var db = CreateInMemoryDb();
+        var db = TestDbContextFactory.CreateInMemoryDb();
         var couponService = new CouponService(db);
         var sut = new CartService(db, couponService);
         return (db, sut);
